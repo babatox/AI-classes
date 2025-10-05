@@ -1,0 +1,28 @@
+import re
+
+# Define patterns and responses
+rules = {
+    r"(hi|hello|hey)": "Hello! How can I assist you today?",
+    r"(bye|goodbye|see you)": "Goodbye! Have a great day!",
+    r"(help|support)": "Sure, I can help. What do you need assistance with?",
+    r"(weather|forecast)": "Please tell me your location so I can check the weather.",
+    r"(your name|who are you)": "I'm your friendly chatbot, here to help!",
+    r"(thank you|thanks)": "You're welcome!"
+}
+
+def chatbot_response(user_input):
+    user_input = user_input.lower()
+    for pattern, response in rules.items():
+        if re.search(pattern, user_input):
+            return response
+    return "I'm not sure I understand. Could you please rephrase?"
+
+# Chat loop
+print("Chatbot is running. Type 'exit' to quit.")
+while True:
+    user_input = input("You: ")
+    if user_input.lower() == "exit":
+        print("Chatbot: Goodbye!")
+        break
+    reply = chatbot_response(user_input)
+    print(f"Chatbot: {reply}")
