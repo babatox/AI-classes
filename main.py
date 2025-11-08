@@ -1,65 +1,24 @@
 import cv2
-import numpy as np
+face_Casacade=cv2.CascadeClassifier(cv2.data.haarcascades +
+'haarcascade_frontalface_default.xml')
+cap=cv2.VideoCapture()
+if not cap.isOpened():
+    print("Error: Could not open camera")
+    exit()
+    while True:
+        ret,frame=cap.read()
+        if not ret:
+            print("ERROR! failedto capture image")
+            break
+        grey=cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+        face=face_cascade.detectMultiScale(gray,ScaleFactor=1.1,minNeighbors=5,minSize=(30,30))
 
-img=cv2.imread('OIP (1).jpg')
-image=cv2.resize(img, (600, 400))
+        for (x, y, w, h)in face:
+            cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
+        cv2.imshow("Face-Detction, press 'q'to Quit",frame)
 
-def apply_red_filter(img):
-    red=img.copy()
-    red[:,:,0]=0 #remove green
-    red[:,:,1]=0 #remove red
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cap.release()
+    cv2.destroyAllWindows
 
-    return red
-
-
-def apply_blue_filter(img):
-    blue=img.copy()
-    blue[:,:,1]=0 #remove blue
-    blue[:,:,2]=0 #remove green
-
-    return blue
-
-def apply_green_filter(img):
-    green=img.copy()
-    green[:,:,0]=0 #remove blue
-    green[:,:,2]=0 #remove red
-
-    return green
-
-def apply_margenta_filter(img):
-    margenta=img.copy()
-    margenta[:,:,0]=0 #remove green
-
-    return margenta
-
-def apply_neutral_filter(img):
-    return img.copy()
-
-print('press keys to apply fiters')
-print("n for neutral")
-print("r for red")
-print("g for green")
-print("b for blue")
-print("m for margenta")
-print("q to Quit")
-
-cv2.imshow("Filtered Images",img)
-while True:
-    key = cv2.waitKey(0) & 0xFF
-    if key==ord('n'):
-        filtered = apply_neutral_filter(img)
-    elif key==ord('r'):
-        filtered = apply_red_filter(img)
-    elif key==ord('g'):
-        filtered = apply_green_filter(img)
-    elif key==ord('b'):
-        filtered = apply_blue_filter(img)
-    elif key==ord('m'):
-        filtered = apply_margenta_filter(img)
-    elif key==ord('q'):
-        break
-    else:
-        continue
-    cv2.imshow('Filtered Image', filtered)
-
-cv2.destroyAllWindows()
