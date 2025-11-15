@@ -1,24 +1,55 @@
 import cv2
-face_Casacade=cv2.CascadeClassifier(cv2.data.haarcascades +
-'haarcascade_frontalface_default.xml')
-cap=cv2.VideoCapture()
-if not cap.isOpened():
-    print("Error: Could not open camera")
-    exit()
-    while True:
-        ret,frame=cap.read()
-        if not ret:
-            print("ERROR! failedto capture image")
-            break
-        grey=cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-        face=face_cascade.detectMultiScale(gray,ScaleFactor=1.1,minNeighbors=5,minSize=(30,30))
+import numpy as np
 
-        for (x, y, w, h)in face:
-            cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
-        cv2.imshow("Face-Detction, press 'q'to Quit",frame)
+cap = cv2.VideoCapture(0)
+mode='normal'
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    cap.release()
-    cv2.destroyAllWindows
+print("""
+Keyboard Controls
+    e - Edge Detection (canny) 
+    r - Red Filter
+    g - Green Filter 
+    b - Blue Filter
+    n - Normal Filter
+    q - Quit
+""")
 
+while True:
+    ret,frame=cap.read()
+    if not ret:
+        break
+
+    frame = cv2.flip(frame, 1)
+
+    if mode=='edge':
+        gray = cv2.cvtColor('frame, cv2.COLOR_BGR2GRAY')
+        frame = cv2.Canny(gray,100,200)
+    elif mode=='red':
+        frame = cv2.inRange(frame,(0, 0, 100),(80, 80, 255))
+    elif mode=='green':
+        frame = cv2.inRange(frame,(0, 100, 0),(80, 255, 80))
+    elif mode== 'blue':
+        frame = cv2.inRange(frame,(100, 0, 0),(255, 80, 80)) 
+
+    cv2.imshow('Real-Time Filter', frame)
+
+    key=cv2.waitKey(1) &0xFF
+    if key == ord('q'):
+        break
+    elif key == ord('e'):
+        mode= 'edge'
+    elif key == ord('r'):
+        mode= 'red'
+    elif key == ord('g'):
+        mode= 'green'
+    elif key == ord('b'):
+        mode= 'blue'
+    elif key == ord('n'):
+        mode= 'normal'
+
+cap.release()
+cv2.destroyAllWindows()
+        
+        
+        
+        
