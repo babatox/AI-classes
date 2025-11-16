@@ -1,55 +1,43 @@
 import cv2
 import numpy as np
 
-cap = cv2.VideoCapture(0)
-mode='normal'
-
-print("""
-Keyboard Controls
-    e - Edge Detection (canny) 
-    r - Red Filter
-    g - Green Filter 
-    b - Blue Filter
-    n - Normal Filter
-    q - Quit
-""")
+cap=cv2.VideoCapture(0)
+if not cap.isOpened():
+    print("Error!!could not open camera")
+    exit()
 
 while True:
     ret,frame=cap.read()
+
     if not ret:
+        print("Error! Failed to capture image")
         break
 
-    frame = cv2.flip(frame, 1)
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    if mode=='edge':
-        gray = cv2.cvtColor('frame, cv2.COLOR_BGR2GRAY')
-        frame = cv2.Canny(gray,100,200)
-    elif mode=='red':
-        frame = cv2.inRange(frame,(0, 0, 100),(80, 80, 255))
-    elif mode=='green':
-        frame = cv2.inRange(frame,(0, 100, 0),(80, 255, 80))
-    elif mode== 'blue':
-        frame = cv2.inRange(frame,(100, 0, 0),(255, 80, 80)) 
+    lower_skin=np.array([0, 20, 70], dtype=np.uint8)
+    upper_skin=np.array([20, 255, 255], dtype=np.uint8)
 
-    cv2.imshow('Real-Time Filter', frame)
+    mask = cv2.inRnge(hsv, lower_skin, upper_skin)
+    result = cv2.bitwise_and(frame, frame, mask=mask )
 
-    key=cv2.waitKey(1) &0xFF
-    if key == ord('q'):
-        break
-    elif key == ord('e'):
-        mode= 'edge'
-    elif key == ord('r'):
-        mode= 'red'
-    elif key == ord('g'):
-        mode= 'green'
-    elif key == ord('b'):
-        mode= 'blue'
-    elif key == ord('n'):
-        mode= 'normal'
+    contours, _ =cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if contours:
+        max_contour= max(contours, key=cv2.contourArea)
+        if cv2.contourArea(max_contour) > 500:
+            x, y, w, h =cv2.boundingRect(max_contour)
+            cv2.rectangel(frame, (x, y)(x +w, y + h),(0, 255,0), 2)
+
+            center_x = int(x + w /2)
+            center_y = int(y + h /2)
+
+            cv2.circle(frame, (center_x, center_y), 5,(0, 0, 255), -1)
+
+        cv2.imshow('Original frame', frame)
+        cv2.imshow('Filtered frame', result)
+
+        if cv2.waitkey(1) & 0xFF == ord ('q'):
+            break
 
 cap.release()
 cv2.destroyAllWindows()
-        
-        
-        
-        
